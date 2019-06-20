@@ -14,3 +14,10 @@ class GameMap:
         tiles[32][32] = Tile(True)
 
         return tiles
+
+    def is_blocked(self, x, y):
+        # Can be shortened, but will apparently be modifying it soon enough to not be necessary
+        if self.tiles[x][y].blocked:
+            return True
+
+        return False
