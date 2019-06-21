@@ -26,33 +26,28 @@ class GameMap:
 
     def make_map(self, max_rooms, min_size, max_size, map_width, map_height, player):
         rooms = []
-        num_rooms = 0
+        # num_rooms = 0
+        failures_in_a_row = 0
+        max_failures_in_a_row = 20
 
-        for i in range(max_rooms):
-            # random w, h
-            w = randint(min_size, max_size)
-            h = randint(min_size, max_size)
-            # random position within map bounds
-            x = randint(0, map_width - w - 1)
-            y = randint(0, map_height - h - 1)
-
+        # This entire while loop is an attempt to make more rooms from less
+        while len(rooms) <= max_rooms and failures_in_a_row < max_failures_in_a_row:
+            w, h = randint(min_size, max_size), randint(min_size, max_size)
+            x, y = randint(0, map_width - w - 1), randint(0, map_height - h - 1)
             new_room = Rect(x, y, w, h)
+
             for room in rooms:
-                # Anyone else not sure 'room' is a word any more?
                 if new_room.intersect(room):
+                    failures_in_a_row += 1
                     break
             else:
-                # No intersections, room is valid.
+                failures_in_a_row = 0
                 self.create_room(new_room)
                 new_x, new_y = new_room.center()
-                if num_rooms == 0:
-                    # Place player in center of 1st room
-                    player.x = new_x
-                    player.y = new_y
+                if len(rooms) == 0:
+                    player.x, player.y = new_x, new_y
                 else:
-                    # All other rooms get to have tunnels joined to prev room
                     prev_x, prev_y = rooms[-1].center()
-                    # Determine order to move; horiz/vert or vert/horiz
                     if randint(0, 1) == 0:
                         self.create_h_tunnel(prev_x, new_x, prev_y)
                         self.create_v_tunnel(prev_y, new_y, new_x)
@@ -60,7 +55,42 @@ class GameMap:
                         self.create_v_tunnel(prev_y, new_y, prev_x)
                         self.create_h_tunnel(prev_x, new_x, new_y)
                 rooms.append(new_room)
-                num_rooms += 1
+                # num_rooms += 1
+
+        # for i in range(max_rooms):
+        #     # random w, h
+        #     w = randint(min_size, max_size)
+        #     h = randint(min_size, max_size)
+        #     # random position within map bounds
+        #     x = randint(0, map_width - w - 1)
+        #     y = randint(0, map_height - h - 1)
+        #
+        #     new_room = Rect(x, y, w, h)
+        #     for room in rooms:
+        #         # Anyone else not sure 'room' is a word any more?
+        #         if new_room.intersect(room):
+        #             break
+        #     else:
+        #         # No intersections, room is valid.
+        #         self.create_room(new_room)
+        #         new_x, new_y = new_room.center()
+        #         if num_rooms == 0:
+        #             # Place player in center of 1st room
+        #             player.x = new_x
+        #             player.y = new_y
+        #         else:
+        #             # All other rooms get to have tunnels joined to prev room
+        #             prev_x, prev_y = rooms[-1].center()
+        #             # Determine order to move; horiz/vert or vert/horiz
+        #             if randint(0, 1) == 0:
+        #                 self.create_h_tunnel(prev_x, new_x, prev_y)
+        #                 self.create_v_tunnel(prev_y, new_y, new_x)
+        #             else:
+        #                 self.create_v_tunnel(prev_y, new_y, prev_x)
+        #                 self.create_h_tunnel(prev_x, new_x, new_y)
+        #         rooms.append(new_room)
+        #         num_rooms += 1
+        return
 
     def create_room(self, room):
         # go through the tiles in the rectangle to make them passable
