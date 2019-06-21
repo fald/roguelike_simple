@@ -2,7 +2,7 @@ from map_objects.tile import Tile
 from map_objects.rectangle import Rect
 from random import randint
 
-# TODO: Double check logic on room overlaps?    
+# TODO: Double check logic on room overlaps?
 # TODO: random map generation, also random mazes. Also? Rooms within mazes!
 # Ideas for generation past basic stuff:
 # Have randomized width pathways between rooms, within a range.
