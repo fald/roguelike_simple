@@ -1,3 +1,6 @@
+from math import sqrt
+import tcod as libtcod
+
 class Entity:
     """
     Base entity; generic object to represent players, enemies, items and more!
@@ -24,6 +27,40 @@ class Entity:
         self.x += dx
         self.y += dy
 
+    def move_towards(self, target_x, target_y, game_map, entities):
+        dx = target_x - self.x
+        dy = target_y - self.y
+        distance = sqrt(dx ** 2 + dy ** 2)
+        dx = int(round(dx / distance))
+        dy = int(round(dy / distance))
+
+        if not (game_map.is_blocked(self.x + dx, self.y + dy) or get_blocking_entities_at_location(entities, self.x + dx, self.y + dy)):
+            self.move(dx, dy)
+
+    def move_astar(self, target, entities, game_map):
+        # Create FOV map with game_map's dimensions
+        fov = libtcod.map_new(game_map.width, game_map.height)
+
+        # Scan current map each turn, set all walls as blocked
+        for y1 in range(game_map.height):
+            for x1 in range(game_map.width):
+                libtcod.map_set_properties(fov, x1, y1, not game_map.tiles[x1][y1].block_sight, not game_map.tiles[x1][y1].blocked)
+        # Scan all objects to determine if they must be navigated around
+        # Ensure checked that object isn't target or self
+        # AI handles what to do if next to target, after all
+        for entity in entities:
+            if entity.blocks and entity != self and entity != target:
+                # Set tile as if it was a wall
+                libtcod.map_set_properties(fov, entity.x, entity.y, True, False)
+        # Allocate an A* path
+        diagonal_move_cost = 1.41
+        my_path = libtcod.path_new_using_map(fov, diagonal_move_cost)
+
+
+    def distance_to(self, other):
+        dx = other.x - self.x
+        dy = other.y - self.y
+        return sqrt(dx ** 2 + dy ** 2)
 
 # This function relates to entities in general, but not to a specific entity, so
 # it is not a method within the class
