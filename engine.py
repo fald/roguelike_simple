@@ -1,10 +1,10 @@
 import tcod as libtcod
 from input_handlers import handle_keys
-from entity import Entity
+from entity import Entity, get_blocking_entities_at_location
 from render_functions import clear_all, render_all
 from map_objects.game_map import GameMap
-from fov_functions import initialize_fov
-from fov_functions import recompute_fov
+from fov_functions import initialize_fov, recompute_fov
+from game_states import GameStates
 
 def main():
     screen_width = 80
@@ -33,7 +33,7 @@ def main():
         'light_ground': libtcod.Color(200, 180, 50),
     }
 
-    player = Entity(0, 0, '@', libtcod.white)
+    player = Entity(0, 0, '@', libtcod.white, "Player", True)
 
     entities = [player]
 
@@ -54,6 +54,8 @@ def main():
     key = libtcod.Key()
     mouse = libtcod.Mouse()
 
+    game_state = GameStates.PLAYER_TURN
+
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS, key, mouse)
 
@@ -72,11 +74,26 @@ def main():
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
 
-        if move:
+        if move and game_state == GameStates.PLAYER_TURN:
             dx, dy = move
-            if not game_map.is_blocked(player.x + dx, player.y + dy):
-                player.move(dx, dy)
-                fov_recompute = True
+            destination_x = player.x + dx
+            destination_y = player.y + dy
+
+            if not game_map.is_blocked(destination_x, destination_y):
+                target = get_blocking_entities_at_location(entities, destination_x, destination_y)
+                if target:
+                    print("You kick the " + target.name + " in the shins, much to its annoyance!")
+                else:
+                    player.move(dx, dy)
+                    fov_recompute = True
+                game_state = GameStates.ENEMY_TURN
+
+        if game_state == GameStates.ENEMY_TURN:
+            for entity in entities:
+                if entity != player:
+                    print("The " + entity.name + " ponders the meaning of life. Is it to smash?")
+            game_state = GameStates.PLAYER_TURN
+
 
         if exit:
             return True

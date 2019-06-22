@@ -26,8 +26,7 @@ class GameMap:
 
         return tiles
 
-    def make_map(self, max_rooms, min_size, max_size, map_width, map_height,
-                player, entities, max_monsters_per_room):
+    def make_map(self, max_rooms, min_size, max_size, map_width, map_height, player, entities, max_monsters_per_room):
         rooms = []
         # num_rooms = 0
         failures_in_a_row = 0
@@ -129,8 +128,8 @@ class GameMap:
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
                 # If not overlapping another monster...
                 if randint(0, 100) < 80:
-                    monster = Entity(x, y, 'o', libtcod.desaturated_green)
+                    monster = Entity(x, y, 'o', libtcod.desaturated_green, "Orc", True)
                 else:
-                    monster = Entity(x, y, 'T', libtcod.darker_green)
+                    monster = Entity(x, y, 'T', libtcod.darker_green, "Troll", True)
 
                 entities.append(monster)
