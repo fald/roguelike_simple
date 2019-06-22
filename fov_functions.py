@@ -1,5 +1,7 @@
 import tcod as libtcod
 
+# TODO: Implement enemy fov
+
 def initialize_fov(game_map):
     fov_map = libtcod.map_new(game_map.width, game_map.height)
 

@@ -5,6 +5,9 @@ from render_functions import clear_all, render_all
 from map_objects.game_map import GameMap
 from fov_functions import initialize_fov, recompute_fov
 from game_states import GameStates
+from components.ai import BasicMonster
+from components.fighter import Fighter
+
 
 def main():
     screen_width = 80
@@ -33,7 +36,8 @@ def main():
         'light_ground': libtcod.Color(200, 180, 50),
     }
 
-    player = Entity(0, 0, '@', libtcod.white, "Player", True)
+    player_fighter_component = Fighter(30, 3, 3)
+    player = Entity(0, 0, '@', libtcod.white, "Player", blocks=True, fighter=player_fighter_component)
 
     entities = [player]
 
@@ -90,8 +94,8 @@ def main():
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
-                if entity != player:
-                    print("The " + entity.name + " ponders the meaning of life. Is it to smash?")
+                if entity.ai:
+                    entity.ai.take_turn()
             game_state = GameStates.PLAYER_TURN
 
 
