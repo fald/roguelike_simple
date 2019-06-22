@@ -17,6 +17,8 @@ def main():
     room_min_size = 6
     max_rooms = 30
 
+    max_monsters_per_room = 5
+
     # default libtcod algorithm
     fov_algorithm = 0
     # light up visible walls?
@@ -31,10 +33,9 @@ def main():
         'light_ground': libtcod.Color(200, 180, 50),
     }
 
-    player = Entity(int(screen_width / 2), int(screen_height / 2), '@', libtcod.white)
-    npc = Entity(int(screen_width / 2 - 5), int(screen_height / 2), '@', libtcod.yellow)
+    player = Entity(0, 0, '@', libtcod.white)
 
-    entities = [player, npc]
+    entities = [player]
 
     libtcod.console_set_custom_font('./Assets/arial10x10.png', libtcod.FONT_TYPE_GRAYSCALE | libtcod.FONT_LAYOUT_TCOD)
     libtcod.console_init_root(screen_width, screen_height, 'libtcod totorial revised', False)
@@ -42,7 +43,7 @@ def main():
     con = libtcod.console_new(screen_width, screen_height)
 
     game_map = GameMap(map_width, map_height)
-    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player)
+    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room)
 
     # Apart from special circumstances (ie using a torch or whatever),
     # don't need to update fov each turn, just when moving.

@@ -1,6 +1,8 @@
 from map_objects.tile import Tile
 from map_objects.rectangle import Rect
 from random import randint
+from entity import Entity
+import tcod as libtcod
 
 # TODO: Double check logic on room overlaps?
 # TODO: random map generation, also random mazes. Also? Rooms within mazes!
@@ -24,7 +26,8 @@ class GameMap:
 
         return tiles
 
-    def make_map(self, max_rooms, min_size, max_size, map_width, map_height, player):
+    def make_map(self, max_rooms, min_size, max_size, map_width, map_height,
+                player, entities, max_monsters_per_room):
         rooms = []
         # num_rooms = 0
         failures_in_a_row = 0
@@ -54,6 +57,8 @@ class GameMap:
                     else:
                         self.create_v_tunnel(prev_y, new_y, prev_x)
                         self.create_h_tunnel(prev_x, new_x, new_y)
+
+                self.place_entities(new_room, entities, max_monsters_per_room)
                 rooms.append(new_room)
                 # num_rooms += 1
 
@@ -115,3 +120,17 @@ class GameMap:
             return True
 
         return False
+
+    def place_entities(self, room, entities, max_monsters_per_room):
+        num_monsters = randint(0, max_monsters_per_room)
+        for i in range(num_monsters):
+            x = randint(room.x1 + 1, room.x2 - 1)
+            y = randint(room.y1 + 1, room.y2 - 1)
+            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+                # If not overlapping another monster...
+                if randint(0, 100) < 80:
+                    monster = Entity(x, y, 'o', libtcod.desaturated_green)
+                else:
+                    monster = Entity(x, y, 'T', libtcod.darker_green)
+
+                entities.append(monster)
