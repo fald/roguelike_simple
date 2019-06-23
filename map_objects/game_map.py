@@ -5,6 +5,7 @@ from entity import Entity
 import tcod as libtcod
 from components.ai import BasicMonster
 from components.fighter import Fighter
+from render_functions import RenderOrder
 
 # TODO: Double check logic on room overlaps?
 # TODO: random map generation, also random mazes. Also? Rooms within mazes!
@@ -124,19 +125,18 @@ class GameMap:
 
     def place_entities(self, room, entities, max_monsters_per_room):
         num_monsters = randint(0, max_monsters_per_room)
-        orc_fighter_component = Fighter(10, 0, 3)
-        troll_fighter_component = Fighter(16, 1, 4)
-        orc_ai_component = BasicMonster()
-        troll_ai_component = BasicMonster()
-
         for i in range(num_monsters):
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
                 # If not overlapping another monster...
                 if randint(0, 100) < 80:
-                    monster = Entity(x, y, 'o', libtcod.desaturated_green, "Orc", blocks=True, fighter=orc_fighter_component, ai=orc_ai_component)
+                    orc_fighter_component = Fighter(10, 0, 3)
+                    orc_ai_component = BasicMonster()
+                    monster = Entity(x, y, 'o', libtcod.desaturated_green, "Orc", blocks=True, render_order=RenderOrder.ACTOR, fighter=orc_fighter_component, ai=orc_ai_component)
                 else:
-                    monster = Entity(x, y, 'T', libtcod.darker_green, "Troll", blocks=True, fighter=troll_fighter_component, ai=troll_ai_component)
+                    troll_fighter_component = Fighter(16, 1, 4)
+                    troll_ai_component = BasicMonster()
+                    monster = Entity(x, y, 'T', libtcod.darker_green, "Troll", blocks=True, render_order=RenderOrder.ACTOR, fighter=troll_fighter_component, ai=troll_ai_component)
 
                 entities.append(monster)

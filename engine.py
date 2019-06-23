@@ -1,15 +1,13 @@
 import tcod as libtcod
 from input_handlers import handle_keys
 from entity import Entity, get_blocking_entities_at_location
-from render_functions import clear_all, render_all
+from render_functions import clear_all, render_all, RenderOrder
 from map_objects.game_map import GameMap
 from fov_functions import initialize_fov, recompute_fov
 from game_states import GameStates
 from components.ai import BasicMonster
 from components.fighter import Fighter
-
-
-# This is to test VSCodes thing
+from death_functions import kill_monster, kill_player
 
 def main():
     screen_width = 80
@@ -39,7 +37,7 @@ def main():
     }
 
     player_fighter_component = Fighter(30, 3, 3)
-    player = Entity(0, 0, '@', libtcod.white, "Player", blocks=True, fighter=player_fighter_component)
+    player = Entity(0, 0, '@', libtcod.white, "Player", blocks=True, render_order=RenderOrder.ACTOR, fighter=player_fighter_component)
 
     entities = [player]
 
@@ -68,7 +66,7 @@ def main():
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
-        render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
+        render_all(con, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, colors)
         fov_recompute = False
 
         libtcod.console_flush()
@@ -79,6 +77,7 @@ def main():
         move = action.get('move')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
+        player_turn_results = []
 
         if move and game_state == GameStates.PLAYER_TURN:
             dx, dy = move
@@ -88,17 +87,45 @@ def main():
             if not game_map.is_blocked(destination_x, destination_y):
                 target = get_blocking_entities_at_location(entities, destination_x, destination_y)
                 if target:
-                    print("You kick the " + target.name + " in the shins, much to its annoyance!")
+                    attack_results = player.fighter.attack(target)
+                    player_turn_results.extend(attack_results)
                 else:
                     player.move(dx, dy)
                     fov_recompute = True
                 game_state = GameStates.ENEMY_TURN
+        
+            for result in player_turn_results:
+                message = result.get('message')
+                dead_entity = result.get('dead')
+
+                if message:
+                    print(message)
+                if dead_entity:
+                    if dead_entity == player:
+                        message, game_state = kill_player(dead_entity)
+                    else:
+                        message = kill_monster(dead_entity)
+                    print(message)
 
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
                 if entity.ai:
-                    entity.ai.take_turn(player, fov_map, game_map, entities)
-            game_state = GameStates.PLAYER_TURN
+                    entity_turn_results = entity.ai.take_turn(player, fov_map, game_map, entities)
+                    for result in entity_turn_results:
+                        message = result.get('message')
+                        dead_entity = result.get('dead')
+                        if message:
+                            print(message)
+                        if dead_entity:
+                            if dead_entity == player:
+                                message, game_state = kill_player(dead_entity)
+                            else:
+                                message = kill_monster(dead_entity)
+                            print(message)
+                    if game_state == GameStates.PLAYER_DEAD:
+                        break
+            else: # for-else for when the break in the for is triggered
+                game_state = GameStates.PLAYER_TURN
 
 
         if exit:
@@ -106,7 +133,6 @@ def main():
 
         if fullscreen:
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-
 
 if __name__ == "__main__":
     main()

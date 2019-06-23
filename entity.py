@@ -1,12 +1,13 @@
 from math import sqrt
 import tcod as libtcod
+from render_functions import RenderOrder
 
 class Entity:
     """
     Base entity; generic object to represent players, enemies, items and more!
     """
 
-    def __init__(self, x, y, char, color, name, blocks=False, fighter=None, ai=None):
+    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None):
         self.x = x
         self.y = y
         self.char = char
@@ -15,6 +16,7 @@ class Entity:
         self.blocks = blocks
         self.fighter = fighter
         self.ai = ai
+        self.render_order = render_order
 
         # Setting the owner of the components to self for future use when
         # we may want to access the entity from the component.
@@ -55,6 +57,27 @@ class Entity:
         # Allocate an A* path
         diagonal_move_cost = 1.41
         my_path = libtcod.path_new_using_map(fov, diagonal_move_cost)
+        # Compute path between self and target's coordinates
+        libtcod.path_compute(my_path, self.x, self.y, target.x, target.y)
+
+        # Check if this path exists, and if so, if its shorter than some tolerance
+        # Path size matters if you want the monster to use alternate pathways, such as through other rooms.
+        # Example, player in corridor, but limit the tolerance so mobs don't go around whole map.
+        path_tolerance = 25
+        if not libtcod.path_is_empty(my_path) and libtcod.path_size(my_path) < path_tolerance:
+            # Find next coordinates in completed full path
+            x, y = libtcod.path_walk(my_path, True)
+            if x or y:
+                # Set self coordinates to next tile (???????????)
+                self.x = x
+                self.y = y
+        else:
+            # In case of no path (ie something is temporarily blocking), at least make it move towards player, dumbly
+            self.move_towards(target.x, target.y, game_map, entities)
+
+            # Free memory, apparently we need to pay attention to that, maybe it wasn't all Atom's fault...
+        libtcod.path_delete(my_path)
+
 
 
     def distance_to(self, other):

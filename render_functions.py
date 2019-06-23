@@ -1,9 +1,15 @@
 import tcod as libtcod
+from enum import Enum
 
 # Would these be better suited to entity functions?
 # Probably not if we're separating entities from map!
 
-def render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, screen_height, colors):
+class RenderOrder(Enum):
+    CORPSE = 1
+    ITEM = 2
+    ACTOR = 3
+
+def render_all(con, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, colors):
     if fov_recompute:
         for y in range(game_map.height):
             for x in range(game_map.width):
@@ -23,10 +29,12 @@ def render_all(con, entities, game_map, fov_map, fov_recompute, screen_width, sc
                     # else:
                     #     libtcod.console_set_char_background(con, x, y, libtcod.Color(255, 255, 255), libtcod.BKGND_SET)
 
-    # Draw all entities in list
-    for entity in entities:
+    # Draw all entities in list...in render order!
+    ordered_entities = sorted(entities, key=lambda x: x.render_order.value)
+    for entity in ordered_entities:
         draw_entity(con, entity, fov_map)
-
+    libtcod.console_set_default_foreground(con, libtcod.white)
+    libtcod.console_print_ex(con, 1, screen_height - 2, libtcod.BKGND_NONE, libtcod.LEFT, 'HP: {0:02}/{1:02}'.format(player.fighter.current_hp, player.fighter.max_hp))
     libtcod.console_blit(con, 0, 0, screen_width, screen_height, 0, 0 ,0)
 
 def clear_all(con, entities):
