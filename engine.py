@@ -9,6 +9,8 @@ from components.ai import BasicMonster
 from components.fighter import Fighter
 
 
+# This is to test VSCodes thing
+
 def main():
     screen_width = 80
     screen_height = 50
