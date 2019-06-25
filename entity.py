@@ -7,7 +7,7 @@ class Entity:
     Base entity; generic object to represent players, enemies, items and more!
     """
 
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None):
+    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, fighter=None, ai=None, inventory=None, item=None):
         self.x = x
         self.y = y
         self.char = char
@@ -16,6 +16,8 @@ class Entity:
         self.blocks = blocks
         self.fighter = fighter
         self.ai = ai
+        self.inventory = inventory
+        self.item = item
         self.render_order = render_order
 
         # Setting the owner of the components to self for future use when
@@ -24,6 +26,10 @@ class Entity:
             self.fighter.owner = self
         if self.ai:
             self.ai.owner = self
+        if self.item:
+            self.item.owner = self
+        if self.inventory:
+            self.inventory.owner = self
 
     def move(self, dx, dy):
         self.x += dx

@@ -5,6 +5,7 @@ from entity import Entity
 import tcod as libtcod
 from components.ai import BasicMonster
 from components.fighter import Fighter
+from components.item import Item
 from render_functions import RenderOrder
 
 # TODO: Double check logic on room overlaps?
@@ -130,7 +131,8 @@ class GameMap:
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                item = Entity(x, y, '!', libtcod.violet, 'Potion of Healing', False)
+                item_component = Item()
+                item = Entity(x, y, '!', libtcod.violet, 'Potion of Healing', blocks=False, render_order=RenderOrder.ITEM, item=item_component)
                 entities.append(item)
 
         # Mobs

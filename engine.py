@@ -7,6 +7,8 @@ from fov_functions import initialize_fov, recompute_fov
 from game_states import GameStates
 from components.ai import BasicMonster
 from components.fighter import Fighter
+from components.inventory import Inventory
+from components.item import Item
 from death_functions import kill_monster, kill_player
 from game_messages import MessageLog
 
@@ -49,7 +51,8 @@ def main():
     }
 
     player_fighter_component = Fighter(30, 3, 3)
-    player = Entity(0, 0, '@', libtcod.white, "Player", blocks=True, render_order=RenderOrder.ACTOR, fighter=player_fighter_component)
+    player_inventory_component = Inventory(26)
+    player = Entity(0, 0, '@', libtcod.white, "Player", blocks=True, render_order=RenderOrder.ACTOR, fighter=player_fighter_component, inventory=player_inventory_component)
 
     entities = [player]
 
