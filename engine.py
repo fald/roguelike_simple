@@ -22,6 +22,7 @@ def main():
     max_rooms = 30
 
     max_monsters_per_room = 5
+    max_items_per_room = 1
 
     # HP stuff
     bar_width = 20
@@ -59,7 +60,7 @@ def main():
     panel = libtcod.console_new(screen_width, panel_height)
 
     game_map = GameMap(map_width, map_height)
-    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room)
+    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room, max_items_per_room)
 
     # Apart from special circumstances (ie using a torch or whatever),
     # don't need to update fov each turn, just when moving.

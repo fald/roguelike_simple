@@ -29,7 +29,7 @@ class GameMap:
 
         return tiles
 
-    def make_map(self, max_rooms, min_size, max_size, map_width, map_height, player, entities, max_monsters_per_room):
+    def make_map(self, max_rooms, min_size, max_size, map_width, map_height, player, entities, max_monsters_per_room, max_items_per_room):
         rooms = []
         # num_rooms = 0
         failures_in_a_row = 0
@@ -60,7 +60,7 @@ class GameMap:
                         self.create_v_tunnel(prev_y, new_y, prev_x)
                         self.create_h_tunnel(prev_x, new_x, new_y)
 
-                self.place_entities(new_room, entities, max_monsters_per_room)
+                self.place_entities(new_room, entities, max_monsters_per_room, max_items_per_room)
                 rooms.append(new_room)
                 # num_rooms += 1
 
@@ -123,7 +123,17 @@ class GameMap:
 
         return False
 
-    def place_entities(self, room, entities, max_monsters_per_room):
+    def place_entities(self, room, entities, max_monsters_per_room, max_items_per_room):
+        # Items
+        num_items = randint(0, max_items_per_room)
+        for i in range(num_items):
+            x = randint(room.x1 + 1, room.x2 - 1)
+            y = randint(room.y1 + 1, room.y2 - 1)
+            if not any([entity for entity in entities if entity.x == x and entity.y == y]):
+                item = Entity(x, y, '!', libtcod.violet, 'Potion of Healing', False)
+                entities.append(item)
+
+        # Mobs
         num_monsters = randint(0, max_monsters_per_room)
         for i in range(num_monsters):
             x = randint(room.x1 + 1, room.x2 - 1)
