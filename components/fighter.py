@@ -1,3 +1,4 @@
+from game_messages import Message
 
 # Component for entities that allows them to fight.
 # Holds the information directly related to combat, so we avoid
@@ -20,10 +21,10 @@ class Fighter:
         results = []
         damage = self.power - target.fighter.defense
         if damage > 0:
-            results.append({'message': "{0} attacks {1} for {2} points of damage!".format(self.owner.name.capitalize(), target.name.capitalize(), str(damage))})
+            results.append({'message': Message("{0} attacks {1} for {2} points of damage!".format(self.owner.name.capitalize(), target.name.capitalize(), str(damage)))})
             results.extend(target.fighter.take_damage(damage))
         else:
-            results.append({'message': "{0} tries to hurt {1}, but his bitch-ass noddle arms aren't up to the challenge!".format(self.owner.name.capitalize(), target.name.capitalize())})
+            results.append({'message': Message("{0} tries to hurt {1}, but his bitch-ass noddle arms aren't up to the challenge!".format(self.owner.name.capitalize(), target.name.capitalize()))})
         if target.fighter.current_hp <= 0:
             pass
         return results

@@ -9,8 +9,15 @@ class RenderOrder(Enum):
     ITEM = 2
     ACTOR = 3
 
+def get_names_on_hover(mouse, entities, fov_map):
+    (x, y) = mouse.cx, mouse.cy
+    names = [entity.name for entity in entities
+            if entity.x == x and entity.y == y and libtcod.map_is_in_fov(fov_map, entity.x, entity.y)]
+    names = ', '.join(names)
+
+    return names.capitalize()
+
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
-    # TODO: Fix this; not displaying!
     bar_width = int(float(value) / maximum * total_width)
 
     libtcod.console_set_default_background(panel, back_color)
@@ -23,7 +30,7 @@ def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_c
     libtcod.console_set_default_foreground(panel, libtcod.white)
     libtcod.console_print_ex(panel, int(x + total_width / 2), y, libtcod.BKGND_NONE, libtcod.CENTER, '{0}: {1}/{2}'.format(name, value, maximum))
 
-def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors):
+def render_all(con, panel, message_log, mouse, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors):
     if fov_recompute:
         for y in range(game_map.height):
             for x in range(game_map.width):
@@ -55,7 +62,20 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, s
     libtcod.console_set_default_background(panel, libtcod.black)
     libtcod.console_clear(panel)
 
+    # Game messages
+    y = 1
+    for message in message_log.messages:
+        libtcod.console_set_default_foreground(panel, message.color)
+        libtcod.console_print_ex(panel, message_log.x, y, libtcod.BKGND_NONE, libtcod.LEFT, message.text)
+        y += 1
+
     render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.current_hp, player.fighter.max_hp, libtcod.red, libtcod.darker_red)
+
+    # Mouse hover
+    libtcod.console_set_default_foreground(panel, libtcod.light_gray)
+    libtcod.console_print_ex(panel, 1, 0, libtcod.BKGND_NONE, libtcod.LEFT, get_names_on_hover(mouse, entities, fov_map))
+
+    libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 
 def clear_all(con, entities):
     for entity in entities:
