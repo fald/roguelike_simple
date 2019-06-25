@@ -10,6 +10,7 @@ class RenderOrder(Enum):
     ACTOR = 3
 
 def render_bar(panel, x, y, total_width, name, value, maximum, bar_color, back_color):
+    # TODO: Fix this; not displaying!
     bar_width = int(float(value) / maximum * total_width)
 
     libtcod.console_set_default_background(panel, back_color)
@@ -55,7 +56,6 @@ def render_all(con, panel, entities, player, game_map, fov_map, fov_recompute, s
     libtcod.console_clear(panel)
 
     render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.current_hp, player.fighter.max_hp, libtcod.red, libtcod.darker_red)
-
 
 def clear_all(con, entities):
     for entity in entities:
