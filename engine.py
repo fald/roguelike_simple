@@ -11,6 +11,7 @@ from components.inventory import Inventory
 from components.item import Item
 from death_functions import kill_monster, kill_player
 from game_messages import MessageLog, Message
+from menus import inventory_menu
 
 def main():
     screen_width = 80
@@ -77,6 +78,8 @@ def main():
     mouse = libtcod.Mouse()
 
     game_state = GameStates.PLAYER_TURN
+    # Will be used to return to previous state in case of, for example, opening menu
+    previous_game_state = game_state
 
     while not libtcod.console_is_window_closed():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
@@ -84,23 +87,33 @@ def main():
         if fov_recompute:
             recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
 
-        render_all(con, panel, message_log, mouse, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors)
+        render_all(con, panel, message_log, mouse, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors, game_state)
         fov_recompute = False
 
         libtcod.console_flush()
 
         clear_all(con, entities)
 
-        action = handle_keys(key)
+        action = handle_keys(key, game_state)
         move = action.get('move')
         pickup = action.get('pickup')
+        open_inventory = action.get('open_inventory')
+        inventory_index = action.get('inventory_index')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
         player_turn_results = []
 
+        if open_inventory:
+            previous_game_state = game_state
+            game_state = GameStates.MENU_SCREEN
+        
+        if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(player.inventory.items):
+            item = player.inventory.items[inventory_index]
+            print(item)
+
         if game_state == GameStates.PLAYER_TURN:
             if move:
-        # if move and game_state == GameStates.PLAYER_TURN:
+                # if move and game_state == GameStates.PLAYER_TURN:
                 dx, dy = move
                 destination_x = player.x + dx
                 destination_y = player.y + dy
@@ -138,7 +151,7 @@ def main():
                         break
                 else:
                     message_log.add_message(Message("There is nothing here to pick up...", libtcod.yellow))
-            
+
             for result in player_turn_results:
                 message = result.get('message')
                 dead_entity = result.get('dead')
@@ -155,8 +168,7 @@ def main():
                 if item_added:
                     entities.remove(item_added)
 
-
-        # Enemy Turn (useful comment #1)
+       # Enemy Turn (useful comment #1)
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
                 if entity.ai:
@@ -179,7 +191,10 @@ def main():
 
 
         if exit:
-            return True
+            if game_state == GameStates.MENU_SCREEN:
+                game_state == previous_game_state
+            else:
+                return True
 
         if fullscreen:
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
