@@ -81,9 +81,12 @@ def render_all(con, panel, message_log, mouse, entities, player, game_map, fov_m
     libtcod.console_blit(panel, 0, 0, screen_width, panel_height, 0, 0, panel_y)
 
     # Inventory Stuff
-    if game_state == GameStates.MENU_SCREEN:
-        inventory_menu(con, 'Press the key next to an item to use it, or Esc to cancel.\n',
-                        player.inventory, 50, screen_width, screen_height)
+    if game_state in [GameStates.MENU_SCREEN, GameStates.DROP_INVENTORY]:
+        if game_state == GameStates.MENU_SCREEN:
+            inventory_title = 'Press the key next to an item to use it, or Esc to cancel.\n'
+        else:
+            inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
+        inventory_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
 
 
 def clear_all(con, entities):

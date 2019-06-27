@@ -7,3 +7,4 @@ class GameStates(Enum):
     ENEMY_TURN = 2
     PLAYER_DEAD = 0
     MENU_SCREEN = 3
+    DROP_INVENTORY = 4

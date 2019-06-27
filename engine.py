@@ -13,6 +13,9 @@ from death_functions import kill_monster, kill_player
 from game_messages import MessageLog, Message
 from menus import inventory_menu
 
+# TODO: Bugs with using item (no message)
+# TODO: Bugs with dropping item (doesn't show on map)
+
 def main():
     screen_width = 80
     screen_height = 50
@@ -98,6 +101,7 @@ def main():
         move = action.get('move')
         pickup = action.get('pickup')
         open_inventory = action.get('open_inventory')
+        drop_inventory = action.get('drop_inventory')
         inventory_index = action.get('inventory_index')
         exit = action.get('exit')
         fullscreen = action.get('fullscreen')
@@ -107,9 +111,16 @@ def main():
             previous_game_state = game_state
             game_state = GameStates.MENU_SCREEN
         
+        if drop_inventory:
+            previous_game_state = game_state
+            game_state = GameStates.DROP_INVENTORY
+        
         if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(player.inventory.items):
             item = player.inventory.items[inventory_index]
-            print(item)
+            if game_state == GameStates.MENU_SCREEN:
+                player_turn_results.extend(player.inventory.use(item))
+            elif game_state == GameStates.DROP_INVENTORY:
+                player_turn_results.extend(player.inventory.drop(item))
 
         if game_state == GameStates.PLAYER_TURN:
             if move:
@@ -156,6 +167,8 @@ def main():
                 message = result.get('message')
                 dead_entity = result.get('dead')
                 item_added = result.get('item_added')
+                item_used = result.get('consumed')
+                item_dropped = result.get('item_dropped')
 
                 if message:
                     message_log.add_message(message)
@@ -167,6 +180,11 @@ def main():
                     message_log.add_message(message)
                 if item_added:
                     entities.remove(item_added)
+                if item_used:
+                    game_state = GameStates.ENEMY_TURN
+                if item_dropped:
+                    entities.append(item_dropped)
+                    game_state = GameStates.ENEMY_TURN
 
        # Enemy Turn (useful comment #1)
         if game_state == GameStates.ENEMY_TURN:
@@ -191,8 +209,8 @@ def main():
 
 
         if exit:
-            if game_state == GameStates.MENU_SCREEN:
-                game_state == previous_game_state
+            if game_state in [GameStates.MENU_SCREEN, GameStates.DROP_INVENTORY]:
+                game_state = previous_game_state
             else:
                 return True
 

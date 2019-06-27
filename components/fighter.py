@@ -35,3 +35,6 @@ class Fighter:
         if self.current_hp <= 0:
             results.append({'dead': self.owner})
         return results
+
+    def heal(self, amount):
+        self.current_hp = min(self.current_hp + amount, self.max_hp)
