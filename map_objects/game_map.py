@@ -7,7 +7,7 @@ from components.ai import BasicMonster
 from components.fighter import Fighter
 from components.item import Item
 from render_functions import RenderOrder
-from components.item_functions import heal
+from components.item_functions import heal, cast_lightning
 
 # TODO: Double check logic on room overlaps?
 # TODO: random map generation, also random mazes. Also? Rooms within mazes!
@@ -126,14 +126,22 @@ class GameMap:
         return False
 
     def place_entities(self, room, entities, max_monsters_per_room, max_items_per_room):
+        # TODO: Way better way to populate >.>
         # Items
         num_items = randint(0, max_items_per_room)
         for i in range(num_items):
             x = randint(room.x1 + 1, room.x2 - 1)
             y = randint(room.y1 + 1, room.y2 - 1)
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
-                item_component = Item(use_function=heal, amount=4)
-                item = Entity(x, y, '!', libtcod.violet, 'Potion of Healing', blocks=False, render_order=RenderOrder.ITEM, item=item_component)
+                item_chance = randint(0, 100)
+                if item_chance < 50:
+                    # Health pots
+                    item_component = Item(use_function=heal, amount=4)
+                    item = Entity(x, y, '!', libtcod.violet, 'Potion of Healing', blocks=False, render_order=RenderOrder.ITEM, item=item_component)
+                else:
+                    # Lightning scrolls
+                    item_component = Item(use_function=cast_lightning, damage=20, max_range=5)
+                    item = Entity(x, y, '#', libtcod.yellow, "Lightning Scroll", blocks=False, render_order=RenderOrder.ITEM, item=item_component)
                 entities.append(item)
 
         # Mobs
