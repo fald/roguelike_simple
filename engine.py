@@ -123,6 +123,7 @@ def main():
                 player_turn_results.extend(player.inventory.drop(item))
 
         if game_state == GameStates.PLAYER_TURN:
+            # TODO: Put in a handler for results, separate function >_>
             if move:
                 # if move and game_state == GameStates.PLAYER_TURN:
                 dx, dy = move
