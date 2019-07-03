@@ -7,7 +7,8 @@ from components.ai import BasicMonster
 from components.fighter import Fighter
 from components.item import Item
 from render_functions import RenderOrder
-from components.item_functions import heal, cast_lightning
+from components.item_functions import heal, cast_lightning, cast_fireball
+from game_messages import Message
 
 # TODO: Double check logic on room overlaps?
 # TODO: random map generation, also random mazes. Also? Rooms within mazes!
@@ -134,10 +135,14 @@ class GameMap:
             y = randint(room.y1 + 1, room.y2 - 1)
             if not any([entity for entity in entities if entity.x == x and entity.y == y]):
                 item_chance = randint(0, 100)
-                if item_chance < 50:
+                if item_chance < 35:
                     # Health pots
                     item_component = Item(use_function=heal, amount=4)
                     item = Entity(x, y, '!', libtcod.violet, 'Potion of Healing', blocks=False, render_order=RenderOrder.ITEM, item=item_component)
+                elif item_chance < 70:
+                    # Fireball scrolls
+                    item_component = Item(use_function=cast_fireball, damage=15, radius=4, targeting=True, targeting_message=Message('Left click a tile to cast fireball, or right click to cancel.', libtcod.light_cyan))
+                    item = Entity(x, y, '#', libtcod.red, "Fireball Scroll", blocks=False, render_order=RenderOrder.ITEM, item=item_component)
                 else:
                     # Lightning scrolls
                     item_component = Item(use_function=cast_lightning, damage=20, max_range=5)
