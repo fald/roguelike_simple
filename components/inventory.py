@@ -58,7 +58,7 @@ class Inventory:
                 results.append({'targeting': item_entity})
             else:
                 kwargs = {**item_component.function_kwargs, **kwargs}
-                item_use_results = item_component.use(self.owner, **kwargs)
+                item_use_results = item_component.use_function(self.owner, **kwargs)
 
                 for item_use_result in item_use_results:
                     if item_use_result.get('consumed'):
