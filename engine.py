@@ -178,6 +178,21 @@ def main():
                 else:
                     message_log.add_message(Message("There is nothing here to pick up...", libtcod.yellow))
 
+        if exit:
+            if game_state in [GameStates.MENU_SCREEN, GameStates.DROP_INVENTORY]:
+                game_state = previous_game_state
+            elif game_state == GameStates.TARGETING:
+                player_turn_results.append({'targeting_cancelled': True})
+            else:
+                return True
+
+        if fullscreen:
+            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
+
+        # TODO: Quick reset when player dies.
+        # if game_state == GameStates.PLAYER_DEAD:
+        #     pass
+
         for result in player_turn_results:
             # Taking this out of the PLAYER_TURN if-block so it'll take care of things like targeting, too...
             message = result.get('message')
@@ -237,18 +252,6 @@ def main():
                         break
             else: # for-else for when the break in the for is triggered
                 game_state = GameStates.PLAYER_TURN
-
-
-        if exit:
-            if game_state in [GameStates.MENU_SCREEN, GameStates.DROP_INVENTORY]:
-                game_state = previous_game_state
-            elif game_state == GameStates.TARGETING:
-                player_turn_results.append({'targeting_cancelled': True})
-            else:
-                return True
-
-        if fullscreen:
-            libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
 if __name__ == "__main__":
     main()
