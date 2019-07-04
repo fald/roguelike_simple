@@ -101,6 +101,7 @@ def main():
 
         action = handle_keys(key, game_state)
         mouse_action = handle_mouse(mouse)
+
         move = action.get('move')
         pickup = action.get('pickup')
         open_inventory = action.get('open_inventory')
@@ -177,41 +178,44 @@ def main():
                 else:
                     message_log.add_message(Message("There is nothing here to pick up...", libtcod.yellow))
 
-            for result in player_turn_results:
-                message = result.get('message')
-                dead_entity = result.get('dead')
-                item_added = result.get('item_added')
-                item_used = result.get('consumed')
-                item_dropped = result.get('item_dropped')
-                targeting = result.get('targeting')
-                targeting_cancelled = result.get('targeting_cancelled')
+        for result in player_turn_results:
+            # Taking this out of the PLAYER_TURN if-block so it'll take care of things like targeting, too...
+            message = result.get('message')
+            dead_entity = result.get('dead')
+            item_added = result.get('item_added')
+            item_used = result.get('consumed')
+            item_dropped = result.get('item_dropped')
+            targeting = result.get('targeting')
+            targeting_cancelled = result.get('targeting_cancelled')
 
-                if message:
-                    message_log.add_message(message)
-                if dead_entity:
-                    if dead_entity == player:
-                        message, game_state = kill_player(dead_entity)
-                    else:
-                        message = kill_monster(dead_entity)
-                    message_log.add_message(message)
-                if item_added:
-                    entities.remove(item_added)
-                if item_used:
-                    game_state = GameStates.ENEMY_TURN
-                if item_dropped:
-                    entities.append(item_dropped)
-                    game_state = GameStates.ENEMY_TURN
-                if targeting:
-                    # So cancelling targeting won't revert to inventory window
-                    previous_game_state = GameStates.PLAYER_TURN
-                    game_state = GameStates.TARGETING
+            if message:
+                message_log.add_message(message)
+            if dead_entity:
+                if dead_entity == player:
+                    message, game_state = kill_player(dead_entity)
+                else:
+                    message = kill_monster(dead_entity)
+                message_log.add_message(message)
+            if item_added:
+                entities.remove(item_added)
+                # Should probably end turn if picked up an item
+                game_state = GameStates.ENEMY_TURN
+            if item_used:
+                game_state = GameStates.ENEMY_TURN
+            if item_dropped:
+                entities.append(item_dropped)
+                game_state = GameStates.ENEMY_TURN
+            if targeting:
+                # So cancelling targeting won't revert to inventory window
+                previous_game_state = GameStates.PLAYER_TURN
+                game_state = GameStates.TARGETING
 
-                    targeting_item = targeting
+                targeting_item = targeting
 
-                    message_log.add_message(targeting_item.item.targeting_message)
-                if targeting_cancelled:
-                    game_state = previous_game_state
-                    message_log.add_message(Message("Targeting cancelled"))
+                message_log.add_message(targeting_item.item.targeting_message)
+            if targeting_cancelled:
+                game_state = previous_game_state
+                message_log.add_message(Message("Targeting cancelled"))
 
        # Enemy Turn (useful comment #1)
         if game_state == GameStates.ENEMY_TURN:

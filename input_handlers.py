@@ -96,8 +96,8 @@ def handle_mouse(mouse):
     (x, y) = (mouse.cx, mouse.cy)
 
     if mouse.lbutton_pressed:
-        return {'left_click': True}
+        return {'left_click': (x, y)}
     elif mouse.rbutton_pressed:
-        return {'right_click': True}
+        return {'right_click': (x, y)}
     
     return {}

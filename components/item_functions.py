@@ -1,6 +1,6 @@
 import tcod as libtcod
 from game_messages import Message
-from ai import ConfusedMonster
+from components.ai import ConfusedMonster
 
 # TODO: Bugfixing; using items doesn't immediately end turn, and no message gets printed?
 
@@ -39,7 +39,7 @@ def cast_lightning(*args, **kwargs):
                 closest_distance = distance
 
     if target:
-        results.append({'consumed': True, 'target': target, 'message': Message("ZAP! ZING! ZOW! {0} takes {1} lightning damage!".format(target, damage), libtcod.light_azure)})
+        results.append({'consumed': True, 'target': target, 'message': Message("ZAP! ZING! ZOW! {0} takes {1} lightning damage!".format(target.name, damage), libtcod.light_azure)})
         results.extend(target.fighter.take_damage(damage))
     else:
         results.append({'consumed': False, 'target': None, 'message': Message('There was no target in range, you fool!', libtcod.light_red)})
