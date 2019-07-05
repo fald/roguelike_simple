@@ -35,4 +35,27 @@ def get_constants():
         'light_ground': libtcod.Color(200, 180, 50)
     }
 
-    
+    constants = {
+        'window_title': window_title,
+        'screen_width': screen_width,
+        'screen_height': screen_height,
+        'bar_width': bar_width,
+        'panel_height': panel_height,
+        'panel_y': panel_y,
+        'message_x': message_x,
+        'message_height': message_height,
+        'message_width': message_width,
+        'map_width': map_width,
+        'map_height': map_height,
+        'room_max_size': room_max_size,
+        'room_min_size': room_min_size,
+        'max_rooms': max_rooms,
+        'fov_algorithm': fov_algorithm,
+        'fov_light_walls': fov_light_walls,
+        'fov_radius': fov_radius,
+        'max_monsters_per_room': max_monsters_per_room,
+        'max_items_per_room': max_items_per_room,
+        'colors': colors
+    }
+
+    return constants

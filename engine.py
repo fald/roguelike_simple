@@ -12,47 +12,13 @@ from components.item import Item
 from death_functions import kill_monster, kill_player
 from game_messages import MessageLog, Message
 from menus import inventory_menu
+from loader_functions.initialize_new_game import get_constants
 
 # TODO: Bugs with using item (no message)
 # TODO: Bugs with dropping item (doesn't show on map)
 
 def main():
-    screen_width = 80
-    screen_height = 50
-
-    map_width = 80
-    map_height = 43
-
-    room_max_size = 10
-    room_min_size = 6
-    max_rooms = 30
-
-    max_monsters_per_room = 5
-    max_items_per_room = 1
-
-    # HP stuff
-    bar_width = 20
-    panel_height = 7
-    panel_y = screen_height - panel_height
-
-    # Message log
-    message_x = bar_width + 2
-    message_width = screen_width - bar_width - 2
-    message_height = panel_height - 1
-
-    # default libtcod algorithm
-    fov_algorithm = 0
-    # light up visible walls?
-    fov_light_walls = True
-    # vision distance
-    fov_radius = 10
-
-    colors = {
-        'dark_wall': libtcod.Color(0, 0, 100),
-        'dark_ground': libtcod.Color(50, 50, 150),
-        'light_wall': libtcod.Color(130, 110, 50),
-        'light_ground': libtcod.Color(200, 180, 50),
-    }
+    constants = get_constants()
 
     player_fighter_component = Fighter(30, 3, 3)
     player_inventory_component = Inventory(26)
@@ -61,13 +27,13 @@ def main():
     entities = [player]
 
     libtcod.console_set_custom_font('./Assets/arial10x10.png', libtcod.FONT_TYPE_GRAYSCALE | libtcod.FONT_LAYOUT_TCOD)
-    libtcod.console_init_root(screen_width, screen_height, 'libtcod totorial revised', False)
+    libtcod.console_init_root(constants['screen_width'], constants['screen_height'], constants['window_title'], False)
 
-    con = libtcod.console_new(screen_width, screen_height)
-    panel = libtcod.console_new(screen_width, panel_height)
+    con = libtcod.console_new(constants['screen_width'], constants['screen_height'])
+    panel = libtcod.console_new(constants['screen_width'], constants['panel_height'])
 
-    game_map = GameMap(map_width, map_height)
-    game_map.make_map(max_rooms, room_min_size, room_max_size, map_width, map_height, player, entities, max_monsters_per_room, max_items_per_room)
+    game_map = GameMap(constants['map_width'], constants['map_height'])
+    game_map.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'], constants['map_width'], constants['map_height'], player, entities, constants['max_monsters_per_room'], constants['max_items_per_room'])
 
     # Apart from special circumstances (ie using a torch or whatever),
     # don't need to update fov each turn, just when moving.
@@ -75,7 +41,7 @@ def main():
 
     fov_map = initialize_fov(game_map)
 
-    message_log = MessageLog(message_x, message_width, message_height)
+    message_log = MessageLog(constants['message_x'], constants['message_width'], constants['message_height'])
 
     key = libtcod.Key()
     mouse = libtcod.Mouse()
@@ -90,9 +56,9 @@ def main():
         libtcod.sys_check_for_event(libtcod.EVENT_KEY_PRESS | libtcod.EVENT_MOUSE, key, mouse)
 
         if fov_recompute:
-            recompute_fov(fov_map, player.x, player.y, fov_radius, fov_light_walls, fov_algorithm)
+            recompute_fov(fov_map, player.x, player.y, constants['fov_radius'], constants['fov_light_walls'], constants['fov_algorithm'])
 
-        render_all(con, panel, message_log, mouse, entities, player, game_map, fov_map, fov_recompute, screen_width, screen_height, bar_width, panel_height, panel_y, colors, game_state)
+        render_all(con, panel, message_log, mouse, entities, player, game_map, fov_map, fov_recompute, constants['screen_width'], constants['screen_height'], constants['bar_width'], constants['panel_height'], constants['panel_y'], constants['colors'], game_state)
         fov_recompute = False
 
         libtcod.console_flush()
