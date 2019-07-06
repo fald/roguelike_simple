@@ -46,3 +46,7 @@ def main_menu(con, background_image, screen_width, screen_height):
                             libtcod.BKGND_NONE, libtcod.CENTER, "Shamefully by Firas")
     
     menu(con, '', ['Play New Game', 'Continue Last Game', 'Quit'], 24, screen_width, screen_height)
+
+def message_box(con, header, width, screen_width, screen_height):
+    menu(con, header, [], width, screen_width, screen_height)
+    
