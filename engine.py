@@ -99,19 +99,6 @@ def main():
                         fov_recompute = True
                     game_state = GameStates.ENEMY_TURN
             
-                # for result in player_turn_results:
-                #     message = result.get('message')
-                #     dead_entity = result.get('dead')
-
-                #     if message:
-                #         message_log.add_message(message)
-                #     if dead_entity:
-                #         if dead_entity == player:
-                #             message, game_state = kill_player(dead_entity)
-                #         else:
-                #             message = kill_monster(dead_entity)
-                #         message_log.add_message(message)
-            # Whoa, a different action!
             elif pickup:
                 for entity in entities:
                     if entity.item and entity.x == player.x and entity.y == player.y:
@@ -135,8 +122,6 @@ def main():
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
 
         # TODO: Quick reset when player dies.
-        # if game_state == GameStates.PLAYER_DEAD:
-        #     pass
 
         for result in player_turn_results:
             # Taking this out of the PLAYER_TURN if-block so it'll take care of things like targeting, too...
