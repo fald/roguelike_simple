@@ -217,17 +217,17 @@ def main():
             action = handle_main_menu(key)
 
             new_game = action.get('new_game')
-            load_game = action.get('load_game')
+            load_previous_game = action.get('load_game') # lol load_game is scoped as the loader function
             exit_game = action.get('exit_game')
 
-            if show_load_error_message and (new_game or load_game or exit_game):
+            if show_load_error_message and (new_game or load_previous_zgame or exit_game):
                 show_load_error_message = False
             elif new_game:
                 player, entities, game_map, message_log, game_state = get_game_variables(constants)
                 # TODO: Why game_state in get_game_variables if its just being set here??
                 game_state = GameStates.PLAYER_TURN
                 show_main_menu = False
-            elif load_game:
+            elif load_previous_game:
                 try:
                     player, entities, game_map, message_log, game_state = load_game()
                     show_main_menu = False

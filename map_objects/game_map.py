@@ -6,6 +6,7 @@ import tcod as libtcod
 from components.ai import BasicMonster
 from components.fighter import Fighter
 from components.item import Item
+from components.stairs import Stairs
 from render_functions import RenderOrder
 from components.item_functions import heal, cast_lightning, cast_fireball, cast_confuse
 from game_messages import Message
@@ -22,10 +23,11 @@ from game_messages import Message
 # TODO: Just use len(rooms) instead of num_room variable...?
 
 class GameMap:
-    def __init__(self, width, height):
+    def __init__(self, width, height, dungeon_level=1):
         self.width = width
         self.height = height
         self.tiles = self.initialize_tiles()
+        self.dungeon_level = dungeon_level
 
     def initialize_tiles(self):
         tiles = [[Tile(True) for y in range(self.height)] for x in range(self.width)]
@@ -37,6 +39,10 @@ class GameMap:
         # num_rooms = 0
         failures_in_a_row = 0
         max_failures_in_a_row = 20
+
+        # Stairs just going to be in middle of final room for simplicity.
+        center_of_last_room_x = None
+        center_of_last_room_y = None
 
         # This entire while loop is an attempt to make more rooms from less
         while len(rooms) <= max_rooms and failures_in_a_row < max_failures_in_a_row:
@@ -52,6 +58,8 @@ class GameMap:
                 failures_in_a_row = 0
                 self.create_room(new_room)
                 new_x, new_y = new_room.center()
+                center_of_last_room_x = new_x
+                center_of_last_room_y = new_y
                 if len(rooms) == 0:
                     player.x, player.y = new_x, new_y
                 else:
@@ -65,41 +73,12 @@ class GameMap:
 
                 self.place_entities(new_room, entities, max_monsters_per_room, max_items_per_room)
                 rooms.append(new_room)
-                # num_rooms += 1
+        
+        stairs_component = Stairs(self.dungeon_level + 1)
+        down_stairs = Entity(center_of_last_room_x, center_of_last_room_y, '>', libtcod.white,
+                            'Stairs', blocks=False, render_order=RenderOrder.STAIRS, stairs=stairs_component)
+        entities.append(down_stairs)
 
-        # for i in range(max_rooms):
-        #     # random w, h
-        #     w = randint(min_size, max_size)
-        #     h = randint(min_size, max_size)
-        #     # random position within map bounds
-        #     x = randint(0, map_width - w - 1)
-        #     y = randint(0, map_height - h - 1)
-        #
-        #     new_room = Rect(x, y, w, h)
-        #     for room in rooms:
-        #         # Anyone else not sure 'room' is a word any more?
-        #         if new_room.intersect(room):
-        #             break
-        #     else:
-        #         # No intersections, room is valid.
-        #         self.create_room(new_room)
-        #         new_x, new_y = new_room.center()
-        #         if num_rooms == 0:
-        #             # Place player in center of 1st room
-        #             player.x = new_x
-        #             player.y = new_y
-        #         else:
-        #             # All other rooms get to have tunnels joined to prev room
-        #             prev_x, prev_y = rooms[-1].center()
-        #             # Determine order to move; horiz/vert or vert/horiz
-        #             if randint(0, 1) == 0:
-        #                 self.create_h_tunnel(prev_x, new_x, prev_y)
-        #                 self.create_v_tunnel(prev_y, new_y, new_x)
-        #             else:
-        #                 self.create_v_tunnel(prev_y, new_y, prev_x)
-        #                 self.create_h_tunnel(prev_x, new_x, new_y)
-        #         rooms.append(new_room)
-        #         num_rooms += 1
         return
 
     def create_room(self, room):
