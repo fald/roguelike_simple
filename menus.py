@@ -55,7 +55,7 @@ def level_up_menu(con, header, player, menu_width, screen_width, screen_height):
     # Looks gross
     old_hp = player.fighter.max_hp
     new_hp = ceil(old_hp * 1.2)
-    old_power = player.fighter.old_power
+    old_power = player.fighter.power
     new_power = ceil(old_power * 1.2)
     old_defense = player.fighter.defense
     new_defense = ceil(old_defense * 1.2)

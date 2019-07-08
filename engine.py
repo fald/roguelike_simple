@@ -117,7 +117,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             
             elif wait:
                 # TODO: Heal on wait?
-                game_state == GameStates.ENEMY_TURN
+                game_state = GameStates.ENEMY_TURN
 
             elif pickup:
                 for entity in entities:
@@ -151,8 +151,6 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
         if fullscreen:
             libtcod.console_set_fullscreen(not libtcod.console_is_fullscreen())
-
-        # TODO: Quick reset when player dies.
 
         for result in player_turn_results:
             # Taking this out of the PLAYER_TURN if-block so it'll take care of things like targeting, too...
