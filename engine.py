@@ -52,6 +52,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         fullscreen = action.get('fullscreen')
         left_click = mouse_action.get('left_click')
         right_click = mouse_action.get('right_click')
+        take_stairs = action.get('take_stairs')
         player_turn_results = []
 
         if open_inventory:
@@ -105,6 +106,17 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         break
                 else:
                     message_log.add_message(Message("There is nothing here to pick up...", libtcod.yellow))
+
+            elif take_stairs and game_state == GameStates.PLAYER_TURN:
+                for entity in entities:
+                    if entity.stairs and entity.x == player.x and entity.y == player.y:
+                        entities = game_map.next_floor(player, message_log, constants)
+                        fov_map = initialize_fov(game_map)
+                        fov_recompute = True
+                        libtcod.console_clear(con)
+                        break
+                else:
+                    message_log.add_message(Message('There are no stairs here, stop that.', libtcod.yellow))
 
         if exit:
             if game_state in [GameStates.MENU_SCREEN, GameStates.DROP_INVENTORY]:
@@ -220,7 +232,7 @@ def main():
             load_previous_game = action.get('load_game') # lol load_game is scoped as the loader function
             exit_game = action.get('exit_game')
 
-            if show_load_error_message and (new_game or load_previous_zgame or exit_game):
+            if show_load_error_message and (new_game or load_previous_game or exit_game):
                 show_load_error_message = False
             elif new_game:
                 player, entities, game_map, message_log, game_state = get_game_variables(constants)

@@ -21,6 +21,7 @@ from game_messages import Message
 # TODO: Allow graphics in place of characters; still simple, no real animation.
 # TODO: More elegant way to random generate rooms?
 # TODO: Just use len(rooms) instead of num_room variable...?
+# TODO: Allow going back up a floor
 
 class GameMap:
     def __init__(self, width, height, dungeon_level=1):
@@ -149,3 +150,15 @@ class GameMap:
                     monster = Entity(x, y, 'T', libtcod.darker_green, "Troll", blocks=True, render_order=RenderOrder.ACTOR, fighter=troll_fighter_component, ai=troll_ai_component)
 
                 entities.append(monster)
+
+    def next_floor(self, player, message_log, constants):
+        self.dungeon_level += 1
+        entities = [player]
+        self.tiles = self.initialize_tiles()
+        self.make_map(constants['max_rooms'], constants['room_min_size'], constants['room_max_size'], constants['map_width'],
+                        constants['map_height'], player, entities, constants['max_monsters_per_room'],
+                        constants['max_items_per_room'])
+        player.fighter.heal(player.fighter.max_hp // 2)
+        message_log.add_message(Message('You take a moment to rest and recover your strength.', libtcod.light_violet))
+
+        return entities
