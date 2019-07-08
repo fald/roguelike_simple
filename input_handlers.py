@@ -12,6 +12,8 @@ def handle_keys(key, game_state):
         return handle_targeting_keys(key)
     elif game_state == GameStates.LEVEL_UP:
         return handle_level_up_menu(key)
+    elif game_state == GameStates.CHAR_MENU:
+        return handle_char_menu(key)
 
     return {}
     
@@ -37,6 +39,9 @@ def handle_player_turn_keys(key):
         return {'move': (1, 1)}
     elif key.vk == libtcod.KEY_ENTER:
         return {'take_stairs': True}
+    # Wait!
+    elif key_char == 'x':
+        return {'wait': True}
 
     # Grab
     if key_char == 'g':
@@ -47,6 +52,10 @@ def handle_player_turn_keys(key):
         return {'open_inventory': True}
     elif key_char == 'o':
         return {'drop_inventory': True}
+
+    # Player data
+    if key_char == 'p':
+        return {'character_menu': True}
 
     if key.vk == libtcod.KEY_ENTER and key.lalt:
         # Alt + Enter toggles fullscreen
@@ -124,4 +133,9 @@ def handle_level_up_menu(key):
             return {'level_up': 'power'}
         elif key_char == 'c':
             return {'level_up': 'def'}
+    return {}
+
+def handle_char_menu(key):
+    if key.vk == libtcod.KEY_ESCAPE:
+        return {'exit': True}
     return {}

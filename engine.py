@@ -55,6 +55,8 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         right_click = mouse_action.get('right_click')
         take_stairs = action.get('take_stairs')
         level_up = action.get('level_up')
+        character_menu = action.get('character_menu')
+        wait = action.get('wait')
         player_turn_results = []
 
         if open_inventory:
@@ -75,6 +77,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             # Full heal!
             player.fighter.current_hp = player.fighter.max_hp
             game_state = previous_game_state
+
+        if character_menu:
+            previous_game_state = game_state
+            game_state = GameStates.CHAR_MENU
         
         if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(player.inventory.items):
             item = player.inventory.items[inventory_index]
@@ -109,6 +115,10 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                         fov_recompute = True
                     game_state = GameStates.ENEMY_TURN
             
+            elif wait:
+                # TODO: Heal on wait?
+                game_state == GameStates.ENEMY_TURN
+
             elif pickup:
                 for entity in entities:
                     if entity.item and entity.x == player.x and entity.y == player.y:
@@ -132,7 +142,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                     message_log.add_message(Message('There are no stairs here, stop that.', libtcod.yellow))
 
         if exit:
-            if game_state in [GameStates.MENU_SCREEN, GameStates.DROP_INVENTORY]:
+            if game_state in [GameStates.MENU_SCREEN, GameStates.DROP_INVENTORY, GameStates.CHAR_MENU]:
                 game_state = previous_game_state
             elif game_state == GameStates.TARGETING:
                 player_turn_results.append({'targeting_cancelled': True})

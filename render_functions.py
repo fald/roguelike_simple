@@ -1,7 +1,7 @@
 import tcod as libtcod
 from enum import Enum
 from game_states import GameStates
-from menus import inventory_menu, level_up_menu
+from menus import inventory_menu, level_up_menu, character_screen_menu
 
 # Would these be better suited to entity functions?
 # Probably not if we're separating entities from map!
@@ -93,6 +93,9 @@ def render_all(con, panel, message_log, mouse, entities, player, game_map, fov_m
 
     if game_state == GameStates.LEVEL_UP:
         level_up_menu(con, "Level up! Choose a stat to raise:", player, 40, screen_width, screen_height)
+
+    if game_state == GameStates.CHAR_MENU:
+        character_screen_menu(player, 30, 10, screen_width, screen_height)
 
 
 def clear_all(con, entities):

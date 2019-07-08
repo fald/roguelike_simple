@@ -64,3 +64,39 @@ def level_up_menu(con, header, player, menu_width, screen_width, screen_height):
                 'AGI: +20% DEF ({0}->{1})'.format(old_defense, new_defense)]
 
     menu(con, header, options, menu_width, screen_width, screen_height)
+
+# Woops, no options, kind of pointless
+# def character_screen_menu(con, header, player, width, screen_width, screen_height):
+#     stats = [
+#         'Name: {0}'.format(player.name),
+#         'Level: {0}'.format(player.level.curr_level),
+#         'XP: {0}/{1}'.format(player.level.curr_xp, player.level.experience_to_next_level),
+#         'HP {0}/{1}'.format(player.fighter.current_hp, player.fighter.max_hp),
+#         'Power: {0}'.format(player.fighter.power),
+#         'Defense: {0}'.format(player.fighter.defense)
+#     ]
+
+#     menu(con, header, stats, width, screen_width, screen_height)
+
+def character_screen_menu(player, character_screen_width, character_screen_height, screen_width, screen_height):
+    display = [
+        'Character Information',
+        'Name: {0}'.format(player.name),
+        'Level: {0}'.format(player.level.curr_level),
+        'XP: {0}/{1}'.format(player.level.curr_xp, player.level.experience_to_next_level),
+        'HP {0}/{1}'.format(player.fighter.current_hp, player.fighter.max_hp),
+        'Power: {0}'.format(player.fighter.power),
+        'Defense: {0}'.format(player.fighter.defense)
+    ]
+    window = libtcod.console_new(character_screen_width, character_screen_height)
+    libtcod.console_set_default_foreground(window, libtcod.white)
+
+    for i in range(len(display)):
+        libtcod.console_print_rect_ex(
+            window, 0, i, character_screen_width, character_screen_height,
+            libtcod.BKGND_NONE, libtcod.LEFT, display[i]
+        )
+    
+    x = screen_width // 2
+    y = screen_height // 2
+    libtcod.console_blit(window, 0, 0, character_screen_width, character_screen_height, 0, x, y, 1.0, 0.7)
