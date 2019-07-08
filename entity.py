@@ -6,9 +6,9 @@ class Entity:
     """
     Base entity; generic object to represent players, enemies, items and more!
     """
-
+    # TODO: Just have a single components library ><
     def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, 
-                fighter=None, ai=None, inventory=None, item=None, stairs=None):
+                fighter=None, ai=None, inventory=None, item=None, stairs=None, level=None):
         self.x = x
         self.y = y
         self.char = char
@@ -21,6 +21,7 @@ class Entity:
         self.item = item
         self.stairs = stairs
         self.render_order = render_order
+        self.level = level
 
         # Setting the owner of the components to self for future use when
         # we may want to access the entity from the component.
@@ -34,6 +35,8 @@ class Entity:
             self.inventory.owner = self
         if self.stairs:
             self.stairs.owner = self
+        if self.level:
+            self.level.owner = self
 
     def move(self, dx, dy):
         self.x += dx

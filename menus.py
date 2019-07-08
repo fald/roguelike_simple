@@ -1,4 +1,5 @@
 import tcod as libtcod
+from math import ceil
 
 def menu(con, header, options, width, screen_width, screen_height):
     if len(options) > 26: raise ValueError("Cannot have such a large menu. Less is more, omae.")
@@ -50,3 +51,16 @@ def main_menu(con, background_image, screen_width, screen_height):
 def message_box(con, header, width, screen_width, screen_height):
     menu(con, header, [], width, screen_width, screen_height)
     
+def level_up_menu(con, header, player, menu_width, screen_width, screen_height):
+    # Looks gross
+    old_hp = player.fighter.max_hp
+    new_hp = ceil(old_hp * 1.2)
+    old_power = player.fighter.old_power
+    new_power = ceil(old_power * 1.2)
+    old_defense = player.fighter.defense
+    new_defense = ceil(old_defense * 1.2)
+    options = ['CON: +20% HP ({0}->{1})'.format(old_hp, new_hp),
+                'STR: +20% ATK ({0}->{1})'.format(old_power, new_power),
+                'AGI: +20% DEF ({0}->{1})'.format(old_defense, new_defense)]
+
+    menu(con, header, options, menu_width, screen_width, screen_height)

@@ -9,3 +9,4 @@ class GameStates(Enum):
     MENU_SCREEN = 3
     DROP_INVENTORY = 4
     TARGETING = 5
+    LEVEL_UP = 6

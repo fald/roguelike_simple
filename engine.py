@@ -11,6 +11,7 @@ from game_messages import Message
 from menus import inventory_menu, main_menu, message_box
 from loader_functions.initialize_new_game import get_constants, get_game_variables
 from loader_functions.data_loaders import save_game, load_game
+from math import ceil
 
 # TODO: Pass constants into methods instead of a bunch of separate shit :x
 # TODO: Put play_game elsewhere?
@@ -53,6 +54,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         left_click = mouse_action.get('left_click')
         right_click = mouse_action.get('right_click')
         take_stairs = action.get('take_stairs')
+        level_up = action.get('level_up')
         player_turn_results = []
 
         if open_inventory:
@@ -62,6 +64,17 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
         if drop_inventory:
             previous_game_state = game_state
             game_state = GameStates.DROP_INVENTORY
+
+        if level_up:
+            if level_up == 'hp':
+                player.fighter.max_hp = ceil(player.fighter.max_hp * 1.2)
+            elif level_up == 'power':
+                player.fighter.power = ceil(player.fighter.power * 1.2)
+            elif level_up == 'def':
+                player.fighter.defense = ceil(player.fighter.defense * 1.2)
+            # Full heal!
+            player.fighter.current_hp = player.fighter.max_hp
+            game_state = previous_game_state
         
         if inventory_index is not None and previous_game_state != GameStates.PLAYER_DEAD and inventory_index < len(player.inventory.items):
             item = player.inventory.items[inventory_index]
@@ -140,6 +153,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             item_dropped = result.get('item_dropped')
             targeting = result.get('targeting')
             targeting_cancelled = result.get('targeting_cancelled')
+            xp_gain = result.get('xp')
 
             if message:
                 message_log.add_message(message)
@@ -162,13 +176,19 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                 # So cancelling targeting won't revert to inventory window
                 previous_game_state = GameStates.PLAYER_TURN
                 game_state = GameStates.TARGETING
-
                 targeting_item = targeting
-
                 message_log.add_message(targeting_item.item.targeting_message)
             if targeting_cancelled:
                 game_state = previous_game_state
                 message_log.add_message(Message("Targeting cancelled"))
+            if xp_gain:
+                leveled_up = player.level.add_xp(xp_gain)
+                message_log.add_message(Message('You gain {0} experience points!'.format(xp_gain)))
+                if leveled_up:
+                    message_log.add_message(Message(
+                                'You feel somewhat stronger! You reached level {0}!'.format(player.level.curr_level), libtcod.yellow))
+                    previous_game_state = game_state
+                    game_state = GameStates.LEVEL_UP
 
        # Enemy Turn (useful comment #1)
         if game_state == GameStates.ENEMY_TURN:

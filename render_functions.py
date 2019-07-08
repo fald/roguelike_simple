@@ -1,7 +1,7 @@
 import tcod as libtcod
 from enum import Enum
 from game_states import GameStates
-from menus import inventory_menu
+from menus import inventory_menu, level_up_menu
 
 # Would these be better suited to entity functions?
 # Probably not if we're separating entities from map!
@@ -74,6 +74,8 @@ def render_all(con, panel, message_log, mouse, entities, player, game_map, fov_m
         y += 1
 
     render_bar(panel, 1, 1, bar_width, 'HP', player.fighter.current_hp, player.fighter.max_hp, libtcod.red, libtcod.darker_red)
+    libtcod.console_print_ex(panel, 1, 3, libtcod.BKGND_NONE, libtcod.LEFT,
+                            'Dungeon Level: {0}'.format(game_map.dungeon_level))
 
     # Mouse hover
     libtcod.console_set_default_foreground(panel, libtcod.light_gray)
@@ -88,6 +90,9 @@ def render_all(con, panel, message_log, mouse, entities, player, game_map, fov_m
         else:
             inventory_title = 'Press the key next to an item to drop it, or Esc to cancel.\n'
         inventory_menu(con, inventory_title, player.inventory, 50, screen_width, screen_height)
+
+    if game_state == GameStates.LEVEL_UP:
+        level_up_menu(con, "Level up! Choose a stat to raise:", player, 40, screen_width, screen_height)
 
 
 def clear_all(con, entities):

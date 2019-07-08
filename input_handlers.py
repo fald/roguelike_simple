@@ -10,10 +10,11 @@ def handle_keys(key, game_state):
         return handle_inventory_keys(key)
     elif game_state == GameStates.TARGETING:
         return handle_targeting_keys(key)
+    elif game_state == GameStates.LEVEL_UP:
+        return handle_level_up_menu(key)
 
     return {}
     
-
 def handle_player_turn_keys(key):
     key_char = chr(key.c)
     # Movement keys
@@ -112,4 +113,15 @@ def handle_main_menu(key):
         return {'load_game': True}
     elif key_char == 'c' or key.vk == libtcod.KEY_ESCAPE:
         return {'exit_game': True}
+    return {}
+
+def handle_level_up_menu(key):
+    if key:
+        key_char = chr(key.c)
+        if key_char == 'a':
+            return {'level_up': 'hp'}
+        elif key_char == 'b':
+            return {'level_up': 'power'}
+        elif key_char == 'c':
+            return {'level_up': 'def'}
     return {}

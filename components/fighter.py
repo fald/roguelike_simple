@@ -10,12 +10,13 @@ from game_messages import Message
 # Example, parent and child would inherit person, but child would be a composition of parent.
 
 class Fighter:
-    def __init__(self, hp, defense, power, owner=None):
+    def __init__(self, hp, defense, power, owner=None, xp=0):
         self.max_hp = hp
         self.current_hp = self.max_hp
         self.defense = defense
         self.power = power
         self.owner = owner
+        self.xp = xp
 
     def attack(self, target):
         results = []
@@ -33,7 +34,7 @@ class Fighter:
         results = []
         self.current_hp -= amount
         if self.current_hp <= 0:
-            results.append({'dead': self.owner})
+            results.append({'dead': self.owner, 'xp': self.xp})
         return results
 
     def heal(self, amount):
