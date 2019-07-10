@@ -69,11 +69,11 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
 
         if level_up:
             if level_up == 'hp':
-                player.fighter.max_hp = ceil(player.fighter.max_hp * 1.2)
+                player.fighter.base_max_hp = ceil(player.fighter.base_max_hp * 1.2)
             elif level_up == 'power':
-                player.fighter.power = ceil(player.fighter.power * 1.2)
+                player.fighter.base_power = ceil(player.fighter.base_power * 1.2)
             elif level_up == 'def':
-                player.fighter.defense = ceil(player.fighter.defense * 1.2)
+                player.fighter.base_defense = ceil(player.fighter.base_defense * 1.2)
             # Full heal!
             player.fighter.current_hp = player.fighter.max_hp
             game_state = previous_game_state
