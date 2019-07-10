@@ -1,14 +1,18 @@
 from math import sqrt
 import tcod as libtcod
 from render_functions import RenderOrder
+from components.item import Item
 
 class Entity:
     """
     Base entity; generic object to represent players, enemies, items and more!
     """
     # TODO: Just have a single components library ><
-    def __init__(self, x, y, char, color, name, blocks=False, render_order=RenderOrder.CORPSE, 
-                fighter=None, ai=None, inventory=None, item=None, stairs=None, level=None):
+    def __init__(
+        self, x, y, char, color, name, blocks=False, 
+        render_order=RenderOrder.CORPSE, fighter=None, 
+        ai=None, inventory=None, item=None, stairs=None, 
+        level=None, equippable=None, equipment=None):
         self.x = x
         self.y = y
         self.char = char
@@ -22,6 +26,8 @@ class Entity:
         self.stairs = stairs
         self.render_order = render_order
         self.level = level
+        self.equipment = equipment
+        self.equippable = equippable
 
         # Setting the owner of the components to self for future use when
         # we may want to access the entity from the component.
@@ -37,6 +43,15 @@ class Entity:
             self.stairs.owner = self
         if self.level:
             self.level.owner = self
+        if self.equipment:
+            self.equipment.owner = self
+        if self.equippable:
+            self.equippable.owner = self
+            # All equippables are items by default, so make sure they are
+            if not self.item:
+                item = Item()
+                self.item = item
+                self.item.owner = self
 
     def move(self, dx, dy):
         self.x += dx

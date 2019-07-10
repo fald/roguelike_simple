@@ -162,6 +162,7 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
             targeting = result.get('targeting')
             targeting_cancelled = result.get('targeting_cancelled')
             xp_gain = result.get('xp')
+            equip = result.get('equip')
 
             if message:
                 message_log.add_message(message)
@@ -197,7 +198,17 @@ def play_game(player, entities, game_map, message_log, game_state, con, panel, c
                                 'You feel somewhat stronger! You reached level {0}!'.format(player.level.curr_level), libtcod.yellow))
                     previous_game_state = game_state
                     game_state = GameStates.LEVEL_UP
-
+            if equip:
+                equip_results = player.equipment.toggle_equip(equip)
+                for equip_result in equip_results:
+                    equipped = equip_result.get('equipped')
+                    unequipped = equip_result.get('unequipped')
+                    if equipped:
+                        message_log.add_message(Message("You equipped the {0}".format(equipped.name)))
+                    if unequipped:
+                        message_log.add_message(Message("You unequipped the {0}".format(unequipped.name)))
+                game_state = GameStates.ENEMY_TURN
+                
        # Enemy Turn (useful comment #1)
         if game_state == GameStates.ENEMY_TURN:
             for entity in entities:
