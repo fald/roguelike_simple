@@ -12,7 +12,7 @@ from game_messages import Message
 class Fighter:
     def __init__(self, hp, defense, power, owner=None, xp=0):
         self.base_max_hp = hp
-        self.current_hp = self.max_hp
+        self.current_hp = hp
         self.base_defense = defense
         self.base_power = power
         self.owner = owner
@@ -21,7 +21,7 @@ class Fighter:
     @property
     def max_hp(self):
         if self.owner and self.owner.equipment:
-            bonus = self.owner.equipment.hp_bonus
+                bonus = self.owner.equipment.hp_bonus
         else:
             bonus = 0
 
@@ -39,7 +39,7 @@ class Fighter:
     @property
     def defense(self):
         if self.owner and self.owner.equipment:
-            bonus = self.owner.equipment.defense
+            bonus = self.owner.equipment.defense_bonus
         else:
             bonus = 0
 
