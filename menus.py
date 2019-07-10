@@ -29,12 +29,21 @@ def menu(con, header, options, width, screen_width, screen_height):
     y = int(screen_height / 2 - height / 2)
     libtcod.console_blit(window, 0, 0, width, height, 0, x, y, 1.0, 0.7)
 
-def inventory_menu(con, header, inventory, inventory_width, screen_width, screen_height):
+def inventory_menu(con, header, player, inventory_width, screen_width, screen_height):
     # Show menu with each inventory item as an option
+    inventory = player.inventory
     if len(inventory.items) == 0:
         options = ['Inventory is empty.']
     else:
-        options = [item.name for item in inventory.items]
+        # options = [item.name for item in inventory.items]
+        options = []
+        for item in player.inventory.items:
+            if player.equipment.main_hand == item:
+                options.append('{0} - Equipped'.format(item.name))
+            elif player.equipment.off_hand == item:
+                options.append('{0} - Equipped'.format(item.name))
+            else:
+                options.append(item.name)
 
     menu(con, header, options, inventory_width, screen_width, screen_height)
 
@@ -64,19 +73,6 @@ def level_up_menu(con, header, player, menu_width, screen_width, screen_height):
                 'AGI: +20% DEF ({0}->{1})'.format(old_defense, new_defense)]
 
     menu(con, header, options, menu_width, screen_width, screen_height)
-
-# Woops, no options, kind of pointless
-# def character_screen_menu(con, header, player, width, screen_width, screen_height):
-#     stats = [
-#         'Name: {0}'.format(player.name),
-#         'Level: {0}'.format(player.level.curr_level),
-#         'XP: {0}/{1}'.format(player.level.curr_xp, player.level.experience_to_next_level),
-#         'HP {0}/{1}'.format(player.fighter.current_hp, player.fighter.max_hp),
-#         'Power: {0}'.format(player.fighter.power),
-#         'Defense: {0}'.format(player.fighter.defense)
-#     ]
-
-#     menu(con, header, stats, width, screen_width, screen_height)
 
 def character_screen_menu(player, character_screen_width, character_screen_height, screen_width, screen_height):
     display = [
