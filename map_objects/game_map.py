@@ -7,6 +7,8 @@ from components.ai import BasicMonster
 from components.fighter import Fighter
 from components.item import Item
 from components.stairs import Stairs
+from components.equipment import Equipment, EquipmentSlots
+from components.equippable import Equippable
 from render_functions import RenderOrder
 from components.item_functions import heal, cast_lightning, cast_fireball, cast_confuse
 from game_messages import Message
@@ -112,6 +114,8 @@ class GameMap:
         max_items_per_room = from_dungeon_level([[1, 1], [2, 4]], self.dungeon_level)
         num_items = randint(0, max_items_per_room)
         item_chances = {
+            'sword': from_dungeon_level([[5, 4]], self.dungeon_level),
+            'shield': from_dungeon_level([[15, 8]], self.dungeon_level),
             'healing_potion': 35,
             'lightning_scroll': from_dungeon_level([[25, 4]], self.dungeon_level),
             'fireball_scroll': from_dungeon_level([[25, 6]], self.dungeon_level),
@@ -134,10 +138,17 @@ class GameMap:
                     # Confuse scrolls
                     item_component = Item(use_function=cast_confuse, targeting=True, targeting_message=Message("Left click on an enemy to confuse it, or right click to cancel", libtcod.light_cyan))
                     item = Entity(x, y, '#', libtcod.light_pink, "Confusion Scroll", blocks=False, render_order=RenderOrder.ITEM, item=item_component)
-                else:
+                elif item_choice == 'lightning_scroll':
                     # Lightning scrolls
                     item_component = Item(use_function=cast_lightning, damage=50, max_range=5)
                     item = Entity(x, y, '#', libtcod.yellow, "Lightning Scroll", blocks=False, render_order=RenderOrder.ITEM, item=item_component)
+                elif item_choice == 'sword':
+                    # Yadda yadda
+                    equippable_component = Equippable(EquipmentSlots.MAIN_HAND, power_bonus=3)
+                    item = Entity(x, y, '/', libtcod.sky, 'Sword', equippable=equippable_component)
+                elif item_choice == 'shield':
+                    equippable_component = Equippable(EquipmentSlots.OFF_HAND, defense_bonus=1)
+                    item = Entity(x, y, '[', libtcod.darker_orange, 'Shield', equippable=equippable_component)
                 entities.append(item)
 
         # Mobs
