@@ -152,6 +152,7 @@ class GameMap:
                 entities.append(item)
 
         # Mobs
+        # Bad way of doing constants. Fix it, or just hard code it? Fix it for new projects, learn from my mistakes, future me.
         max_monsters_per_room = from_dungeon_level([[2, 1], [3, 4], [5, 6]], self.dungeon_level)
         num_monsters = randint(0, max_monsters_per_room)
         monster_chances = {
@@ -165,13 +166,19 @@ class GameMap:
                 # If not overlapping another monster...
                 monster_choice = random_choice_from_dict(monster_chances)
                 if monster_choice == 'orc':
-                    orc_fighter_component = Fighter(20, 0, 4, xp=35)
+                    orc_fighter_component = Fighter(20, 0, 4, xp=35, attack_speed=20)
                     orc_ai_component = BasicMonster()
-                    monster = Entity(x, y, 'o', libtcod.desaturated_green, "Orc", blocks=True, render_order=RenderOrder.ACTOR, fighter=orc_fighter_component, ai=orc_ai_component)
+                    monster = Entity(
+                        x, y, 'o', libtcod.desaturated_green, "Orc", blocks=True, 
+                        render_order=RenderOrder.ACTOR, fighter=orc_fighter_component, 
+                        ai=orc_ai_component, speed=8)
                 else:
-                    troll_fighter_component = Fighter(30, 2, 8, xp=100)
+                    troll_fighter_component = Fighter(30, 2, 8, xp=100, attack_speed=20)
                     troll_ai_component = BasicMonster()
-                    monster = Entity(x, y, 'T', libtcod.darker_green, "Troll", blocks=True, render_order=RenderOrder.ACTOR, fighter=troll_fighter_component, ai=troll_ai_component)
+                    monster = Entity(
+                        x, y, 'T', libtcod.darker_green, "Troll", blocks=True, 
+                        render_order=RenderOrder.ACTOR, fighter=troll_fighter_component, 
+                        ai=troll_ai_component, speed=8)
 
                 entities.append(monster)
 

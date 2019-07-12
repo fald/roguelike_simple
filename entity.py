@@ -12,7 +12,9 @@ class Entity:
         self, x, y, char, color, name, blocks=False, 
         render_order=RenderOrder.CORPSE, fighter=None, 
         ai=None, inventory=None, item=None, stairs=None, 
-        level=None, equippable=None, equipment=None):
+        level=None, equippable=None, equipment=None,
+        speed=0
+        ):
         self.x = x
         self.y = y
         self.char = char
@@ -28,6 +30,8 @@ class Entity:
         self.level = level
         self.equipment = equipment
         self.equippable = equippable
+        self.speed = speed
+        self.wait = 0
 
         # Setting the owner of the components to self for future use when
         # we may want to access the entity from the component.
@@ -56,6 +60,7 @@ class Entity:
     def move(self, dx, dy):
         self.x += dx
         self.y += dy
+        self.wait = self.speed
 
     def distance(self, target_x, target_y):
         return sqrt((target_x - self.x) ** 2 + (target_y - self.y) ** 2)

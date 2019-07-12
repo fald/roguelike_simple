@@ -46,6 +46,7 @@ def get_constants():
         'light_ground': libtcod.Color(200, 180, 50)
     }
 
+    # TODO: Constants as actual constants?
     constants = {
         'window_title': window_title,
         'screen_width': screen_width,
@@ -64,10 +65,11 @@ def get_constants():
         'fov_algorithm': fov_algorithm,
         'fov_light_walls': fov_light_walls,
         'fov_radius': fov_radius,
-        # Handled in place entities
-        # #'max_monsters_per_room': max_monsters_per_room,
-        #'max_items_per_room': max_items_per_room,
-        'colors': colors
+        'colors': colors,
+        # Real time fightin', speeds are in frames.
+        'player_speed': 2,
+        'default_speed': 8,
+        'default_attack_speed': 20
     }
 
     return constants
@@ -81,7 +83,7 @@ def get_game_variables(constants):
         0, 0, '@', libtcod.white, 'Player', blocks=True, 
         render_order=RenderOrder.ACTOR, fighter=player_fighter_component, 
         inventory=player_inventory_component, level=player_level_component,
-        equipment=player_equipment_component
+        equipment=player_equipment_component, speed=constants['player_speed']
         )
     
     entities = [player]
